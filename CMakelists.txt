@@ -12,7 +12,7 @@ include(FetchContent)
 FetchContent_Declare(
   glfw
   GIT_REPOSITORY https://github.com/glfw/glfw.git
-  GIT_TAG 3.4  # Define a versão desejada da GLFW
+  GIT_TAG master  # Define a versão desejada da GLFW
 )
 
 # Faz o download e compila as bibliotecas

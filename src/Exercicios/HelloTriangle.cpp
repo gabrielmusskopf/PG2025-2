@@ -76,13 +76,13 @@ int main()
 	// Você deve adaptar para a versão do OpenGL suportada por sua placa
 	// Sugestão: comente essas linhas de código para desobrir a versão e
 	// depois atualize (por exemplo: 4.5 com 4 e 5)
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	 glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	 glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	 glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	 glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Ativa a suavização de serrilhado (MSAA) com 8 amostras por pixel
-	glfwWindowHint(GLFW_SAMPLES, 8);
+	// glfwWindowHint(GLFW_SAMPLES, 8);
 
 	// Essencial para computadores da Apple
 	// #ifdef __APPLE__
