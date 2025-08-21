@@ -176,7 +176,7 @@ int main()
 
 		// Chamada de desenho - drawcall
 		// Poligono Preenchido - GL_TRIANGLES
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		// glBindVertexArray(0); // Desnecessário aqui, pois não há múltiplos VAOs
 
@@ -265,10 +265,13 @@ int setupGeometry()
 	GLfloat vertices[] = {
 		// x   y     z
 		// T0
-		-0.5, -0.5, 0.0,     // v0
-		 0.5, -0.5, 0.0,	 // v1
-		 0.0,  0.5, 0.0,	 // v2
+		-0.5,  0.5, 0.0,     // v0
+		-0.5, -0.5, 0.0,	 // v1
+		 0.0,  0.0, 0.0,	 // v2
 		// T1
+        0.0,   0.0, 0.0,     //v3
+        0.5,  -0.5, 0.0,     //v4
+        0.5,   0.5, 0.0      
 
 	};
 
