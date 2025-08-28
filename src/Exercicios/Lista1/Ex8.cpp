@@ -49,20 +49,23 @@ const GLuint WIDTH = 800, HEIGHT = 600;
 const GLchar *vertexShaderSource = R"(
  #version 400
  layout (location = 0) in vec3 position;
+ layout (location = 1) in vec3 color;
+ out vec3 vColor; 
  void main()
  {
 	 gl_Position = vec4(position.x, position.y, position.z, 1.0);
+	 vColor = color;
  }
  )";
 
 // Código fonte do Fragment Shader (em GLSL): ainda hardcoded
 const GLchar *fragmentShaderSource = R"(
  #version 400
- uniform vec4 inputColor;
+ in vec3 vColor;
  out vec4 color;
  void main()
  {
-	 color = inputColor;
+	 color = vec4(vColor,1.0);
  }
  )";
 
@@ -272,15 +275,15 @@ int setupGeometry()
 	// Cada atributo do vértice (coordenada, cores, coordenadas de textura, normal, etc)
 	// Pode ser arazenado em um VBO único ou em VBOs separados
 	GLfloat vertices[] = {
-		// x   y     z
+		// x   y     z   r   g    b
 		// T0
-		-0.5,  0.5, 0.0,     // v0
-		-0.5, -0.5, 0.0,	 // v1
-		 0.0,  0.0, 0.0,	 // v2
+		-0.5,  0.5, 0.0, 1.0, 0.0, 0.0,    // v0
+		-0.5, -0.5, 0.0, 0.0, 1.0, 0.0,    // v1
+		 0.0,  0.0, 0.0, 0.0, 0.0, 1.0,	   // v2
 		// T1
-        0.0,   0.0, 0.0,     //v3
-        0.5,  -0.5, 0.0,     //v4
-        0.5,   0.5, 0.0      
+        0.0,   0.0, 0.0, 1.0, 1.0, 0.0,    //v3
+        0.5,  -0.5, 0.0, 0.0, 1.0, 1.0,    //v4
+        0.5,   0.5, 0.0, 1.0, 0.0, 1.0	   //v5      
 
 	};
 
@@ -304,8 +307,14 @@ int setupGeometry()
 	//  Se está normalizado (entre zero e um)
 	//  Tamanho em bytes
 	//  Deslocamento a partir do byte zero
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
+
+	// Atributo posição - x, y, z
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid *)0);
 	glEnableVertexAttribArray(0);
+
+	// Atributo cor - r, g b
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
 
 	// Observe que isso é permitido, a chamada para glVertexAttribPointer registrou o VBO como o objeto de buffer de vértice
 	// atualmente vinculado - para que depois possamos desvincular com segurança
