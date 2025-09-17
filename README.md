@@ -101,7 +101,7 @@ Recomendamos que você crie um repositório próprio, estruturado com subdiretó
 > Cada diretório dentro de `src/` pode conter um arquivo `README.md` com informações específicas sobre a atividade ou exercício implementado.
 
 Consulte os seguintes materiais para ajuda adicional:
-- [Tutorial de Entregas pelo Github](TutorialEntregasGithub.pdf)
-- [Organizando seu repositório no Github](OrganizandoRepositorioGithub.pdf)
-
-
+- [Tutorial de Entregas pelo Github](misc/TutorialEntregasGithub.pdf)
+- [Organizando seu repositório no Github](misc/OrganizandoRepositorioGithub.pdf)
+- [Exemplo de README.md de repositório](misc/Template_README_Repositorio.md)
+- [Exemplo de README.md para cada projeto](misc/Template_README_Projeto.md)
