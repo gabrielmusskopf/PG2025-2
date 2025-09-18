@@ -48,6 +48,7 @@ set(EXERCISES
     Exercicios/Lista1/Ex5
     Exercicios/Lista1/Ex8
     Exercicios/HelloClasses
+    Exercicios/HelloTexture
 )
 
 add_compile_options(-Wno-pragmas)
@@ -85,10 +86,8 @@ foreach(EXERCISE ${EXERCISES})
     add_executable(${EXE_NAME} ${EXE_SOURCES} ${GLAD_C_FILE})
 
     # Configura includes e bibliotecas
-    target_include_directories(${EXE_NAME} PRIVATE 
-        ${CMAKE_SOURCE_DIR}/include/glad 
-        ${glm_SOURCE_DIR} 
-        ${stb_image_SOURCE_DIR}
-    )
-    target_link_libraries(${EXE_NAME} glfw ${OPENGL_LIBS} glm::glm)
+    target_include_directories(${EXE_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include/glad ${glm_SOURCE_DIR} ${stb_image_SOURCE_DIR})
+
+
+    target_link_libraries(${EXE_NAME} glfw ${OPENGL_LIBS} glm::glm )
 endforeach()
