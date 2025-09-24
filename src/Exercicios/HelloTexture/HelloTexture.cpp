@@ -43,6 +43,8 @@ using namespace std;
 using namespace glm;
 
 // STB_IMAGE
+// STB_IMAGE
+#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 // Protótipo da função de callback de teclado
@@ -141,7 +143,7 @@ int main()
 	// Gerando um buffer simples, com a geometria de um triângulo
 	GLuint VAO = setupGeometry();
 
-	GLuint texID = loadTexture("../../../assets/tex/pixelWall.png");
+	GLuint texID = loadTexture("../assets/tex/pixelWall.png");
 	
 	glUseProgram(shaderID); // Reseta o estado do shader para evitar problemas futuros
 
