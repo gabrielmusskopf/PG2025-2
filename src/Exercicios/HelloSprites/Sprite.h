@@ -7,6 +7,9 @@
 
 using namespace std;
 
+// GLAD
+#include <glad/glad.h>
+
 // GLFW - porque inclui a OpenGL
 #include <GLFW/glfw3.h>
 

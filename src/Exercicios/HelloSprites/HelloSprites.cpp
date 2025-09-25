@@ -60,7 +60,7 @@ GLuint loadTexture(string filePath);
 const GLuint WIDTH = 800, HEIGHT = 600;
 
 // Código fonte do Vertex Shader (em GLSL): ainda hardcoded
-const GLchar *vertexShaderSource = R"(
+const GLchar *vertexShaderSource = R"glsl(
  #version 400
  layout (location = 0) in vec3 position;
  layout (location = 1) in vec2 texc;
@@ -72,10 +72,10 @@ const GLchar *vertexShaderSource = R"(
 	 gl_Position = projection * model * vec4(position.x, position.y, position.z, 1.0);
 	 tex_coord = texc;
  }
- )";
+ )glsl";
 
 // Código fonte do Fragment Shader (em GLSL): ainda hardcoded
-const GLchar *fragmentShaderSource = R"(
+const GLchar *fragmentShaderSource = R"glsl(
  #version 400
  in vec2 tex_coord;
  out vec4 color;
@@ -86,7 +86,7 @@ uniform sampler2D tex_buffer;
  {
 	 color = texture(tex_buffer,tex_coord);
  }
- )";
+ )glsl";
 
 // Função MAIN
 int main()
@@ -143,7 +143,7 @@ int main()
 	GLuint texID = loadTexture("../assets/sprites/planta.png");
 	
     Sprite spr;
-    spr.initialize(shaderID,texID,vec3(0.0,0.0,0.0),vec3(64.0,64.0,1.0));
+    spr.initialize(shaderID,texID,vec3(400.0,300.0,0.0),vec3(64.0,64.0,1.0));
 
 	//Habilitação do teste de profundidade
 	glEnable(GL_DEPTH_TEST);
