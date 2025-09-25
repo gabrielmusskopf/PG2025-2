@@ -49,6 +49,7 @@ set(EXERCISES
     Exercicios/Lista1/Ex8
     Exercicios/HelloClasses
     Exercicios/HelloTexture
+    Exercicios/HelloSprites
 )
 
 add_compile_options(-Wno-pragmas)
