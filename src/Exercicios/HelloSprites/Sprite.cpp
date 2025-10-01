@@ -8,13 +8,19 @@ Sprite::~Sprite()
 {
 }
 
-void Sprite::initialize(GLuint shaderID, GLuint texID, vec3 pos, vec3 dimensions, float angle)
+void Sprite::initialize(GLuint shaderID, GLuint texID, int nAnimations, int nFrames, vec3 pos, vec3 dimensions, float angle)
 {
     this->shaderID = shaderID;
     this->texID = texID;
     this->pos = pos;
     this->dimensions = dimensions;
     this->angle = angle;
+	this->nAnimations = nAnimations;
+	this->nFrames = nFrames;
+	this->iAnimations = 1;
+	this->iFrames = 0;
+	this->d.s = 1.0 / (float) nFrames;
+	this->d.t = 1.0 / (float) nAnimations;
 
     this->VAO = setupGeometry();
 }
@@ -27,6 +33,10 @@ void Sprite::update()
 	// Mandar a matriz de modelo para o shader
 	glUniformMatrix4fv(glGetUniformLocation(shaderID, "model"),1,GL_FALSE,value_ptr(model));
 
+	vec2 offsetTex = vec2(iFrames*d.s,iAnimations * d.t);
+	glUniform2f(glGetUniformLocation(shaderID, "offsetTex"),offsetTex.s,offsetTex.t);
+
+	iFrames = (iFrames + 1) % nFrames;
 }
 
 void Sprite::draw()
@@ -45,11 +55,11 @@ GLuint Sprite::setupGeometry()
 	// Cada atributo do vértice (coordenada, cores, coordenadas de textura, normal, etc)
 	// Pode ser arazenado em um VBO único ou em VBOs separados
 	GLfloat vertices[] = {
-		// x   y     z   s   t
-		-0.5,  0.5 , 0.0, 0.0, 1.0,	// v0
+		// x   y     z    s   t
+		-0.5,  0.5 , 0.0, 0.0, d.t,	// v0
 		-0.5, -0.5 , 0.0, 0.0, 0.0,	// v1
-		 0.5,  0.5 , 0.0, 1.0, 1.0,	// v2
-         0.5, -0.5 , 0.0, 1.0, 0.0	// v3
+		 0.5,  0.5 , 0.0, d.s, d.t,	// v2
+         0.5, -0.5 , 0.0, d.s, 0.0	// v3
 	};
 
 	GLuint VBO;

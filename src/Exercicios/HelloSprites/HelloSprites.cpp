@@ -70,7 +70,7 @@ const GLchar *vertexShaderSource = R"glsl(
  void main()
  {
 	 gl_Position = projection * model * vec4(position.x, position.y, position.z, 1.0);
-	 tex_coord = texc;
+	 tex_coord = vec2(texc.s,1.0-texc.t);
  }
  )glsl";
 
@@ -81,10 +81,11 @@ const GLchar *fragmentShaderSource = R"glsl(
  out vec4 color;
 
 uniform sampler2D tex_buffer;
+uniform vec2 offsetTex;
 
  void main()
  {
-	 color = texture(tex_buffer,tex_coord);
+	 color = texture(tex_buffer,tex_coord+offsetTex);
  }
  )glsl";
 
@@ -140,10 +141,10 @@ int main()
 
 	// Compilando e buildando o programa de shader
 	GLuint shaderID = setupShader();
-	GLuint texID = loadTexture("../assets/sprites/planta.png");
+	GLuint texID = loadTexture("../assets/sprites/planta_spr.png");
 	
     Sprite spr;
-    spr.initialize(shaderID,texID,vec3(400.0,300.0,0.0),vec3(64.0,64.0,1.0));
+    spr.initialize(shaderID,texID,4,6,vec3(400.0,300.0,0.0),vec3(64.0*3,64.0*3,1.0));
 
 	//Habilitação do teste de profundidade
 	glEnable(GL_DEPTH_TEST);
@@ -301,8 +302,8 @@ GLuint loadTexture(string filePath)
 	// Ajusta os parâmetros de wrapping e filtering
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	// Carregamento dos pixels da imagem
 	int width, height, nrChannels;
