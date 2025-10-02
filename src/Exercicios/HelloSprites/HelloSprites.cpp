@@ -55,6 +55,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 // Protótipos das funções
 int setupShader();
 GLuint loadTexture(string filePath);
+void processInput(Sprite &spr);
 
 // Dimensões da janela (pode ser alterado em tempo de execução)
 const GLuint WIDTH = 800, HEIGHT = 600;
@@ -88,6 +89,9 @@ uniform vec2 offsetTex;
 	 color = texture(tex_buffer,tex_coord+offsetTex);
  }
  )glsl";
+
+bool keys[1024];
+
 
 // Função MAIN
 int main()
@@ -138,6 +142,8 @@ int main()
 	cout << "Renderer: " << renderer << endl;
 	cout << "OpenGL version supported " << version << endl;
 
+	//Inicializar o array de controle de teclas
+	for (int i =0; i < 1024; i++) { keys[i] = false; }
 
 	// Compilando e buildando o programa de shader
 	GLuint shaderID = setupShader();
@@ -201,6 +207,7 @@ int main()
 
 		// Checa se houveram eventos de input (key pressed, mouse moved etc.) e chama as funções de callback correspondentes
 		glfwPollEvents();
+		processInput(spr);
 
 		// Limpa o buffer de cor
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // cor de fundo
@@ -237,6 +244,14 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
+	if (action == GLFW_PRESS)
+	{
+		keys[key] = true;
+	}
+	else if (action == GLFW_RELEASE)
+	{
+		keys[key] = false;
+	}
 }
 
 // Esta função está bastante hardcoded - objetivo é compilar e "buildar" um programa de
@@ -334,4 +349,16 @@ GLuint loadTexture(string filePath)
 	glBindTexture(GL_TEXTURE_2D, 0);
 
     return texID;
+}
+
+void processInput(Sprite &spr)
+{
+	if (keys[GLFW_KEY_D])
+	{
+		spr.moveRight();
+	}
+	if (keys[GLFW_KEY_A])
+	{
+		spr.moveLeft();
+	}
 }

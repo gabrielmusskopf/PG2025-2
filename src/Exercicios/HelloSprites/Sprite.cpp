@@ -17,11 +17,13 @@ void Sprite::initialize(GLuint shaderID, GLuint texID, int nAnimations, int nFra
     this->angle = angle;
 	this->nAnimations = nAnimations;
 	this->nFrames = nFrames;
-	this->iAnimations = 1;
+	this->iAnimations = 4;
 	this->iFrames = 0;
 	this->d.s = 1.0 / (float) nFrames;
 	this->d.t = 1.0 / (float) nAnimations;
-
+	this->FPS = 12.0;
+	this->lastTime = 0.0;
+	this->vel = 0.5;
     this->VAO = setupGeometry();
 }
 
@@ -36,7 +38,15 @@ void Sprite::update()
 	vec2 offsetTex = vec2(iFrames*d.s,iAnimations * d.t);
 	glUniform2f(glGetUniformLocation(shaderID, "offsetTex"),offsetTex.s,offsetTex.t);
 
-	iFrames = (iFrames + 1) % nFrames;
+	float now = glfwGetTime();
+	float dt = now - lastTime;
+
+	if (dt >= 1.0/FPS)
+	{
+		iFrames = (iFrames + 1) % nFrames;
+		lastTime = now;
+	}
+
 }
 
 void Sprite::draw()
@@ -46,6 +56,18 @@ void Sprite::draw()
     // Chamada de desenho - drawcall
 	// Poligono Preenchido - GL_TRIANGLE_STRIP
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
+}
+
+void Sprite::moveRight()
+{
+	pos.x += vel;
+	iAnimations = 4;
+}
+
+void Sprite::moveLeft()
+{
+	pos.x -= vel;
+	iAnimations = 3;
 }
 
 GLuint Sprite::setupGeometry()
