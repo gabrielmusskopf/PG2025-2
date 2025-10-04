@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.11...4.0)
-project(FCG2025-1)
+cmake_minimum_required(VERSION 3.11)
+project(PG2025-2)
 
 # Define o padrão do C++
 set(CMAKE_CXX_STANDARD 17)
@@ -14,17 +14,13 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/glfw/glfw.git
   GIT_TAG master  # Define a versão desejada da GLFW
 )
-
-# Faz o download e compila as bibliotecas
 FetchContent_MakeAvailable(glfw)
 
-
 FetchContent_Declare(
-	glm
-	GIT_REPOSITORY	https://github.com/g-truc/glm.git
-	GIT_TAG 	1.0.1
+  glm
+  GIT_REPOSITORY https://github.com/g-truc/glm.git
+  GIT_TAG master
 )
-
 FetchContent_MakeAvailable(glm)
 
 # Configura o FetchContent para baixar a stb_image automaticamente
@@ -33,9 +29,7 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/nothings/stb.git
   GIT_TAG master
 )
-
 FetchContent_MakeAvailable(stb_image)
-
 
 # Adiciona as pastas de cabeçalhos
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -44,11 +38,13 @@ include_directories(${CMAKE_SOURCE_DIR}/include/glad)
 include_directories(${glm_SOURCE_DIR})
 include_directories(${stb_image_SOURCE_DIR})
 
-
-# Lista de exemplos/exercícios podem ser colocados aqui também
+# Lista de exercícios/projetos (um diretório para cada)
 # OBS.: Não pode ter acentos ou caracteres especiais
 set(EXERCISES
     Exercicios/HelloTriangle
+    Exercicios/HelloOrtho
+    Exercicios/HelloTransforms
+    Exercicios/HelloTransformsHardCoded
     Exercicios/Lista1/Ex5
     Exercicios/Lista1/Ex6_a
     Exercicios/Lista1/Ex6_b
@@ -56,6 +52,10 @@ set(EXERCISES
     Exercicios/Lista1/Ex6_d
     Exercicios/Lista1/Ex6_e
     Exercicios/Lista1/Ex7
+    Exercicios/Lista1/Ex8
+    Exercicios/HelloClasses
+    Exercicios/HelloTexture
+    Exercicios/HelloSprites
 )
 
 add_compile_options(-Wno-pragmas)
@@ -76,18 +76,25 @@ set(GLAD_C_FILE "${CMAKE_SOURCE_DIR}/common/glad.c")
 
 # Verifica se os arquivos da GLAD estão no lugar
 if (NOT EXISTS ${GLAD_C_FILE})
-    message(FATAL_ERROR "Arquivo glad.c não encontrado! Baixe a GLAD manualmente em https://glad.dav1d.de/ e coloque glad.h em include/glad/ e glad.c em common/")
+    message(FATAL_ERROR "Arquivo glad.c não encontrado! 
+    Baixe a GLAD manualmente em https://glad.dav1d.de/ 
+    e coloque glad.h em include/glad/ e glad.c em common/")
 endif()
 
-# Cria os executáveis
+# Cria os executáveis (um por diretório listado em EXERCISES)
 foreach(EXERCISE ${EXERCISES})
-    # Extrai o nome do arquivo sem o diretório para o executável
-    get_filename_component(EXE_NAME ${EXERCISE} NAME)                                                                                                                                       
-    
-    # Adiciona o executável usando o nome do arquivo como nome do executável
-    add_executable(${EXE_NAME} src/${EXERCISE}.cpp ${GLAD_C_FILE})
+    # Extrai o nome da pasta como nome do executável
+    get_filename_component(EXE_NAME ${EXERCISE} NAME)
 
-    # Configura as bibliotecas e include dirs para o executável
+    # Coleta todos os .cpp dentro do diretório do exercício
+    file(GLOB EXE_SOURCES src/${EXERCISE}/*.cpp)
+
+    # Cria o executável com todos os .cpp + glad.c
+    add_executable(${EXE_NAME} ${EXE_SOURCES} ${GLAD_C_FILE})
+
+    # Configura includes e bibliotecas
     target_include_directories(${EXE_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include/glad ${glm_SOURCE_DIR} ${stb_image_SOURCE_DIR})
-    target_link_libraries(${EXE_NAME} glfw ${OPENGL_LIBS} glm::glm)
+
+
+    target_link_libraries(${EXE_NAME} glfw ${OPENGL_LIBS} glm::glm )
 endforeach()

@@ -177,8 +177,6 @@ int main()
 		// Chamada de desenho - drawcall
 		// Poligono Preenchido - GL_TRIANGLES
 		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glDrawArrays(GL_LINE_LOOP, 0, 3);
-		glDrawArrays(GL_POINTS, 0, 3);
 
 		glUniform4f(colorLoc, 1.0f, 1.0f, 0.0f, 1.0f); // enviando cor para variável uniform inputColor
 		// Contorno do polígono - GL_LINE_LOOP

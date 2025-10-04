@@ -12,15 +12,29 @@ Este repositório contém exemplos e códigos utilizados na disciplina de **Proc
 │   │   ├── 📂 KHR/           # Diretório com cabeçalhos da Khronos (GLAD)
 │   │       ├── khrplatform.h
 ├── 📂 common/                # Código reutilizável entre os projetos
-│   ├── glad.c                 # Implementação da GLAD
-├── 📂 src/                    # Código-fonte dos exemplos e exemplos/
-│   ├── HelloTriangle.cpp      # Exemplo básico de renderização com OpenGL
-│   ├── ...                    # Outros exemplos e exercícios futuros
-├── 📂 build/                  # Diretório gerado pelo CMake (não incluído no repositório)
-├── 📄 CMakeLists.txt          # Configuração do CMake para compilar os projetos
-├── 📄 README.md               # Este arquivo, com a documentação do repositório
-├── 📄 GettingStarted.md       # Tutorial detalhado sobre como compilar usando o CMake
-├── 📄 ...  
+│   ├── glad.c                # Implementação da GLAD
+├── 📂 src/                   # Código-fonte dos exemplos e exercícios
+│   ├── 📂 HelloTriangle/     # Exemplo básico de renderização com OpenGL
+│   │   └── main.cpp
+│   ├── 📂 HelloOrtho/        # Exemplo com projeção ortográfica
+│   │   └── main.cpp
+│   ├── 📂 HelloTransforms/   # Exemplo com múltiplas classes
+│   │   ├── main.cpp
+│   │   ├── Object.cpp
+│   │   ├── Object.h
+│   │   ├── Shader.cpp
+│   │   └── Shader.h
+│   ├── 📂 Lista1/
+│   │   ├── 📂 Ex5/
+│   │   │   └── main.cpp
+│   │   ├── 📂 Ex8/
+│   │   │   └── main.cpp
+│   └── ...                   # Outros exemplos e exercícios futuros
+├── 📂 build/                 # Diretório gerado pelo CMake (não incluído no repositório)
+├── 📄 CMakeLists.txt         # Configuração do CMake para compilar os projetos
+├── 📄 README.md              # Este arquivo, com a documentação do repositório
+├── 📄 GettingStarted.md      # Tutorial detalhado sobre como compilar usando o CMake
+├── 📄 ...
 ```
 
 Siga as instruções detalhadas em [GettingStarted.md](GettingStarted.md) para configurar e compilar o projeto.
@@ -54,29 +68,40 @@ Recomendamos que você crie um repositório próprio, estruturado com subdiretó
 ```
 📁 PG2025-2/
 ├── 📁 src/
-│   ├── 📁 Lista1/
-│   │   ├── Ex1.cpp
-│   │   ├── Ex2.cpp
-│   │   ├── ...
-│   │   └── README.md
-│   ├── 📁 Lista2/
-│   │   ├── Ex1.cpp
-│   │   ├── ...
-│   │   └── README.md
-│   ├── 📁 TrabalhoGrauA/
-│   │   ├── main.cpp
-│   │   └── README.md
-│   ├── 📁 ...
-├── 📁 include/   # Cabeçalhos comuns (se necessário)
-├── 📁 common/    # Arquivos comuns (como glad.c)
+│ ├── 📁 Lista1/
+│ │ ├── 📁 Ex1/
+│ │ │ └── main.cpp
+│ │ ├── 📁 Ex2/
+│ │ │ └── main.cpp
+│ │ ├── 📁 Ex3/
+│ │ │ └── main.cpp
+│ │ └── README.md
+│ ├── 📁 Lista2/
+│ │ ├── 📁 Ex1/
+│ │ │ └── main.cpp
+│ │ ├── 📁 Ex2/
+│ │ │ └── main.cpp
+│ │ ├── 📁 Ex3/
+│ │ │ └── main.cpp
+│ │ └── README.md
+│ ├── 📁 TrabalhoGrauA/
+│ │ ├── main.cpp
+│ │ ├── Object.cpp
+│ │ ├── Object.h
+│ │ ├── Shader.cpp
+│ │ ├── Shader.h
+│ │ └── README.md
+│ └── ...
+├── 📁 include/ # Cabeçalhos comuns (se necessário)
+├── 📁 common/ # Arquivos comuns (como glad.c)
 ├── 📄 CMakeLists.txt
 └── 📄 README.md
 ```
-
+> Você pode alterar a estrutura dos diretórios, mas sempre que o fizer, adicione-os corretamente no CMakelists.txt.
 > Cada diretório dentro de `src/` pode conter um arquivo `README.md` com informações específicas sobre a atividade ou exercício implementado.
 
 Consulte os seguintes materiais para ajuda adicional:
-- [Tutorial de Entregas pelo Github](TutorialEntregasGithub.pdf)
-- [Organizando seu repositório no Github](OrganizandoRepositorioGithub.pdf)
-
-
+- [Tutorial de Entregas pelo Github](misc/TutorialEntregasGithub.pdf)
+- [Organizando seu repositório no Github](misc/OrganizandoRepositorioGithub.pdf)
+- [Exemplo de README.md de repositório](misc/Template_README_Repositorio.md)
+- [Exemplo de README.md para cada projeto](misc/Template_README_Projeto.md)

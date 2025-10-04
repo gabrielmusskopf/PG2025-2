@@ -35,12 +35,25 @@ using namespace std;
 // GLFW
 #include <GLFW/glfw3.h>
 
+// GLM
+#include <glm/glm.hpp> 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+using namespace glm;
+
+// STB_IMAGE
+// STB_IMAGE
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 // Protótipo da função de callback de teclado
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
 
 // Protótipos das funções
 int setupShader();
 int setupGeometry();
+GLuint loadTexture(string filePath);
 
 // Dimensões da janela (pode ser alterado em tempo de execução)
 const GLuint WIDTH = 800, HEIGHT = 600;
@@ -49,20 +62,28 @@ const GLuint WIDTH = 800, HEIGHT = 600;
 const GLchar *vertexShaderSource = R"(
  #version 400
  layout (location = 0) in vec3 position;
+ layout (location = 1) in vec2 texc;
+ out vec2 tex_coord; 
+ uniform mat4 projection;
+ uniform mat4 model;
  void main()
  {
-	 gl_Position = vec4(position.x, position.y, position.z, 1.0);
+	 gl_Position = projection * model * vec4(position.x, position.y, position.z, 1.0);
+	 tex_coord = texc;
  }
  )";
 
 // Código fonte do Fragment Shader (em GLSL): ainda hardcoded
 const GLchar *fragmentShaderSource = R"(
  #version 400
- uniform vec4 inputColor;
+ in vec2 tex_coord;
  out vec4 color;
+
+uniform sampler2D tex_buffer;
+
  void main()
  {
-	 color = inputColor;
+	 color = texture(tex_buffer,tex_coord);
  }
  )";
 
@@ -115,10 +136,6 @@ int main()
 	cout << "Renderer: " << renderer << endl;
 	cout << "OpenGL version supported " << version << endl;
 
-	// Definindo as dimensões da viewport com as mesmas dimensões da janela da aplicação
-	int width, height;
-	glfwGetFramebufferSize(window, &width, &height);
-	glViewport(0, 0, width, height);
 
 	// Compilando e buildando o programa de shader
 	GLuint shaderID = setupShader();
@@ -126,16 +143,32 @@ int main()
 	// Gerando um buffer simples, com a geometria de um triângulo
 	GLuint VAO = setupGeometry();
 
-	// Enviando a cor desejada (vec4) para o fragment shader
-	// Utilizamos a variáveis do tipo uniform em GLSL para armazenar esse tipo de info
-	// que não está nos buffers
-	GLint colorLoc = glGetUniformLocation(shaderID, "inputColor");
+	GLuint texID = loadTexture("../assets/tex/pixelWall.png");
+	
+	//Habilitação do teste de profundidade
+	glEnable(GL_DEPTH_TEST);
 
 	glUseProgram(shaderID); // Reseta o estado do shader para evitar problemas futuros
 
 	double prev_s = glfwGetTime();	// Define o "tempo anterior" inicial.
 	double title_countdown_s = 0.1; // Intervalo para atualizar o título da janela com o FPS.
 
+	// Criação da matriz de projeção
+	mat4 projection = ortho(0.0, 800.0, 0.0, 600.0, -1.0, 1.0);
+
+	// Utilizamos a variáveis do tipo uniform em GLSL para armazenar esse tipo de info
+	// que não está nos buffers
+	// Mandar a matriz de projeção para o shader
+	glUniformMatrix4fv(glGetUniformLocation(shaderID, "projection"),1,GL_FALSE,value_ptr(projection));
+
+	mat4 model = mat4(1); //matriz identidade
+
+	// Ativar o primeiro buffer de textura do OpenGL
+	glActiveTexture(GL_TEXTURE0);
+
+	// Registrando o nome que o buffer da textura terá no fragment shader
+	glUniform1i(glGetUniformLocation(shaderID, "tex_buffer"), 0);
+	
 	// Loop da aplicação - "game loop"
 	while (!glfwWindowShouldClose(window))
 	{
@@ -165,31 +198,42 @@ int main()
 
 		// Limpa o buffer de cor
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // cor de fundo
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glLineWidth(10);
 		glPointSize(20);
 
-		glBindVertexArray(VAO); // Conectando ao buffer de geometria
+		// Definindo as dimensões da viewport com as mesmas dimensões da janela da aplicação
+		int width, height;
+		glfwGetFramebufferSize(window, &width, &height);
+		glViewport(0, 0, width, height);
 
-		glUniform4f(colorLoc, 0.0f, 0.0f, 1.0f, 1.0f); // enviando cor para variável uniform inputColor
+		glBindVertexArray(VAO); // Conectando ao buffer de geometria
+		glBindTexture(GL_TEXTURE_2D, texID); //Conectando ao buffer de textura
+
+
+		model = mat4(1);
+		model = translate(model,vec3(400.0, 300.0, 0.0));
+		model = scale(model,vec3(400.0, 400.0, 1.0));
+		// Mandar a matriz de modelo para o shader
+		glUniformMatrix4fv(glGetUniformLocation(shaderID, "model"),1,GL_FALSE,value_ptr(model));
 
 		// Chamada de desenho - drawcall
 		// Poligono Preenchido - GL_TRIANGLES
 		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glDrawArrays(GL_LINE_LOOP, 0, 3);
-		glDrawArrays(GL_POINTS, 0, 3);
 
-		glUniform4f(colorLoc, 1.0f, 1.0f, 0.0f, 1.0f); // enviando cor para variável uniform inputColor
-		// Contorno do polígono - GL_LINE_LOOP
-		glDrawArrays(GL_LINE_LOOP, 0, 3);
-		glDrawArrays(GL_LINE_LOOP, 3, 3);
+		//----------------
+		model = mat4(1);
+		model = translate(model,vec3(200.0, 300.0, 0.0));
+		model = scale(model,vec3(100.0, 100.0, 1.0));
+		// Mandar a matriz de modelo para o shader
+		glUniformMatrix4fv(glGetUniformLocation(shaderID, "model"),1,GL_FALSE,value_ptr(model));
 
-		glUniform4f(colorLoc, 1.0f, 0.0f, 1.0f, 1.0f); // enviando cor para variável uniform inputColor
-		// Apenas o desenho dos vértice - GL_POINTS
-		glDrawArrays(GL_POINTS, 0, 6);
+		// Chamada de desenho - drawcall
+		// Poligono Preenchido - GL_TRIANGLES
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		// glBindVertexArray(0); // Desnecessário aqui, pois não há múltiplos VAOs
+		glBindVertexArray(0); // Desnecessário aqui, pois não há múltiplos VAOs
 
 		// Troca os buffers da tela
 		glfwSwapBuffers(window);
@@ -274,16 +318,11 @@ int setupGeometry()
 	// Cada atributo do vértice (coordenada, cores, coordenadas de textura, normal, etc)
 	// Pode ser arazenado em um VBO único ou em VBOs separados
 	GLfloat vertices[] = {
-		// x   y     z
+		// x   y     z   s   t
 		// T0
-		-0.5,  0.5, 0.0,     // v0
-		-0.5, -0.5, 0.0,	 // v1
-		 0.0,  0.0, 0.0,	 // v2
-		// T1
-        0.0,   0.0, 0.0,     //v3
-        0.5,  -0.5, 0.0,     //v4
-        0.5,   0.5, 0.0      
-
+		-0.5, -0.5 , 0.0, 0.0, 0.0,	// v0
+		 0.5, -0.5 , 0.0, 1.0, 0.0,	// v1
+		 0.0,  0.5 , 0.0, 0.5, 1.0	// v2
 	};
 
 	GLuint VBO, VAO;
@@ -306,8 +345,14 @@ int setupGeometry()
 	//  Se está normalizado (entre zero e um)
 	//  Tamanho em bytes
 	//  Deslocamento a partir do byte zero
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
+
+	// Atributo posição - x, y, z
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)0);
 	glEnableVertexAttribArray(0);
+
+	// Atributo coordenada de textura - s, t
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
 
 	// Observe que isso é permitido, a chamada para glVertexAttribPointer registrou o VBO como o objeto de buffer de vértice
 	// atualmente vinculado - para que depois possamos desvincular com segurança
@@ -317,4 +362,49 @@ int setupGeometry()
 	glBindVertexArray(0);
 
 	return VAO;
+}
+
+GLuint loadTexture(string filePath)
+{
+	GLuint texID;
+
+	// Gera o identificador da textura na memória
+	glGenTextures(1, &texID);
+	glBindTexture(GL_TEXTURE_2D, texID);
+
+	// Ajusta os parâmetros de wrapping e filtering
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// Carregamento dos pixels da imagem
+	int width, height, nrChannels;
+	unsigned char *data = stbi_load(filePath.c_str(), &width, &height,
+	&nrChannels, 0);
+
+	if (data)
+	{
+		if (nrChannels == 3) //jpg, bmp
+ 		{
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE,
+			data);
+ 		}
+ 		else //png
+ 		{
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+			data);
+ 		}
+ 		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+
+	// Liberar o data e desconectar a textura
+	stbi_image_free(data);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+    return texID;
 }
