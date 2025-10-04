@@ -24,7 +24,8 @@
  */
 
 #include <iostream>
-#include <string>
+#include <vector> // Incluído para usar std::vector
+#include <cmath>  // Incluído para usar sin() e cos()
 #include <assert.h>
 
 using namespace std;
@@ -40,7 +41,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 
 // Protótipos das funções
 int setupShader();
-int setupGeometry();
+int setupGeometry(int &numVertices);
 
 // Dimensões da janela (pode ser alterado em tempo de execução)
 const GLuint WIDTH = 800, HEIGHT = 600;
@@ -124,7 +125,8 @@ int main()
 	GLuint shaderID = setupShader();
 
 	// Gerando um buffer simples, com a geometria de um triângulo
-	GLuint VAO = setupGeometry();
+    int numVertices;
+	GLuint VAO = setupGeometry(numVertices);
 
 	// Enviando a cor desejada (vec4) para o fragment shader
 	// Utilizamos a variáveis do tipo uniform em GLSL para armazenar esse tipo de info
@@ -176,9 +178,7 @@ int main()
 
 		// Chamada de desenho - drawcall
 		// Poligono Preenchido - GL_TRIANGLES
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glDrawArrays(GL_LINE_LOOP, 0, 3);
-		glDrawArrays(GL_POINTS, 0, 3);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, numVertices);
 
 		// glBindVertexArray(0); // Desnecessário aqui, pois não há múltiplos VAOs
 
@@ -253,58 +253,57 @@ int setupShader()
 	return shaderProgram;
 }
 
-// Esta função está bastante harcoded - objetivo é criar os buffers que armazenam a
-// geometria de um triângulo
-// Apenas atributo coordenada nos vértices
-// 1 VBO com as coordenadas, VAO com apenas 1 ponteiro para atributo
-// A função retorna o identificador do VAO
-int setupGeometry()
+int setupGeometry(int &numVertices)
 {
-	// Aqui setamos as coordenadas x, y e z do triângulo e as armazenamos de forma
-	// sequencial, já visando mandar para o VBO (Vertex Buffer Objects)
-	// Cada atributo do vértice (coordenada, cores, coordenadas de textura, normal, etc)
-	// Pode ser arazenado em um VBO único ou em VBOs separados
-	GLfloat vertices[] = {
-		// x   y     z
-		// T0
-		-0.5,  0.5, 0.0,     // v0
-		-0.5, -0.5, 0.0,	 // v1
-		 0.0,  0.0, 0.0,	 // v2
-		// T1
-        0.0,   0.0, 0.0,     //v3
-        0.5,  -0.5, 0.0,     //v4
-        0.5,   0.5, 0.0      
+    const int numSegments = 100; // Número de segmentos para formar o pentagono
+	const float radius = 0.7f;   // Raio do círculo
+	const float PI = 3.14159265359f;
 
-	};
+	// Define a "meia-abertura" da fatia. PI/4 = 45 graus.
+	// A fatia terá uma abertura total de 2 * sliceAngle (90 graus).
+	const float sliceAngle = PI / 4.0f;	
+
+	vector<GLfloat> vertices;
+
+	// 1. Vértice Central
+	vertices.push_back(0.0f); // x
+	vertices.push_back(0.0f); // y
+	vertices.push_back(0.0f); // z
+
+    // 2. Vértices do Corpo (Arco)
+    // O laço agora vai do ângulo inicial (mouthAngle) ao final (2*PI - mouthAngle)
+    for (int i = 0; i <= numSegments; i++)
+    {
+
+		// Calcula o ângulo atual, mapeando 'i' para o intervalo do arco
+		float currentRatio = float(i) / float(numSegments);
+		float angle = -sliceAngle + currentRatio * (2.0f * sliceAngle);
+
+        float x = radius * cos(angle);
+        float y = radius * sin(angle);
+
+        vertices.push_back(x);
+        vertices.push_back(y);
+        vertices.push_back(0.0f); // z
+    }
+
+	// O número total de vértices é o central + os da circunferência
+	numVertices = vertices.size() / 3;
 
 	GLuint VBO, VAO;
-	// Geração do identificador do VBO
 	glGenBuffers(1, &VBO);
-	// Faz a conexão (vincula) do buffer como um buffer de array
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	// Envia os dados do array de floats para o buffer da OpenGl
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	// Envia os dados do std::vector para o buffer da OpenGL
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
 
-	// Geração do identificador do VAO (Vertex Array Object)
 	glGenVertexArrays(1, &VAO);
-	// Vincula (bind) o VAO primeiro, e em seguida  conecta e seta o(s) buffer(s) de vértices
-	// e os ponteiros para os atributos
 	glBindVertexArray(VAO);
-	// Para cada atributo do vertice, criamos um "AttribPointer" (ponteiro para o atributo), indicando:
-	//  Localização no shader * (a localização dos atributos devem ser correspondentes no layout especificado no vertex shader)
-	//  Numero de valores que o atributo tem (por ex, 3 coordenadas xyz)
-	//  Tipo do dado
-	//  Se está normalizado (entre zero e um)
-	//  Tamanho em bytes
-	//  Deslocamento a partir do byte zero
+	
+	// A configuração do atributo do vértice não muda, pois ainda temos 3 floats por vértice (x, y, z)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
 	glEnableVertexAttribArray(0);
 
-	// Observe que isso é permitido, a chamada para glVertexAttribPointer registrou o VBO como o objeto de buffer de vértice
-	// atualmente vinculado - para que depois possamos desvincular com segurança
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	// Desvincula o VAO (é uma boa prática desvincular qualquer buffer ou array para evitar bugs medonhos)
+	glBindBuffer(GL_ARRAY_BUFFER, 0); 
 	glBindVertexArray(0);
 
 	return VAO;

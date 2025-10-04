@@ -50,6 +50,12 @@ include_directories(${stb_image_SOURCE_DIR})
 set(EXERCISES
     Exercicios/HelloTriangle
     Exercicios/Lista1/Ex5
+    Exercicios/Lista1/Ex6_a
+    Exercicios/Lista1/Ex6_b
+    Exercicios/Lista1/Ex6_c
+    Exercicios/Lista1/Ex6_d
+    Exercicios/Lista1/Ex6_e
+    Exercicios/Lista1/Ex7
 )
 
 add_compile_options(-Wno-pragmas)
