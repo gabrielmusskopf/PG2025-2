@@ -56,6 +56,7 @@ set(EXERCISES
     Exercicios/HelloClasses
     Exercicios/HelloTexture
     Exercicios/HelloSprites
+    Trabalhos/Bomberman
 )
 
 add_compile_options(-Wno-pragmas)
