@@ -25,9 +25,11 @@ class Sprite
     public:
         Sprite();
         ~Sprite();
-        void initialize(GLuint shaderID, GLuint texID, vec3 pos, vec3 dimensions, float angle = 0.0);
+        void initialize(GLuint shaderID, GLuint texID, int nAnimations, int nFrames, vec3 pos, vec3 dimensions, float angle = 0.0);
         void update();
         void draw();
+        void moveRight();
+        void moveLeft();
 
     private:
         GLuint VAO; //id do VAO da geometria
@@ -36,6 +38,11 @@ class Sprite
         vec3 dimensions; //fatores de escala
         float angle; //angulo para rotação no eixo z
         GLuint shaderID; //para acessar o shader
+        int nAnimations, nFrames, iAnimations, iFrames;
+        vec2 d;
+
+        float lastTime, FPS;
+        float vel;
 
         GLuint setupGeometry();
 
