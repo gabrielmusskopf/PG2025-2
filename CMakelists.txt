@@ -50,6 +50,7 @@ set(EXERCISES
     Exercicios/HelloClasses
     Exercicios/HelloTexture
     Exercicios/HelloSprites
+    Exercicios/HelloPixels
 )
 
 add_compile_options(-Wno-pragmas)
