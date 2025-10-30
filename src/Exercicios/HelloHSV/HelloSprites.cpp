@@ -71,7 +71,7 @@ const GLchar *vertexShaderSource = R"glsl(
  void main()
  {
 	 gl_Position = projection * model * vec4(position.x, position.y, position.z, 1.0);
-	 tex_coord = vec2(texc.s,1.0-texc.t);
+	 tex_coord = vec2(1-texc.s,texc.t);
  }
  )glsl";
 
@@ -122,12 +122,12 @@ const GLchar *fragmentShaderSource = R"glsl(
         float H = tex_coord.s;
 
         // Variação didática: use 't' para Saturação
-        float S = tex_coord.t;
-        // float V = u_value;
+        //float S = tex_coord.t;
+        float V = tex_coord.t;
 
         // 2. Pegamos os valores dos uniforms
-        //float S = u_saturation;
-        float V = u_value;
+        float S = u_saturation;
+        //float V = u_value;
 
         // 3. Montamos o vetor e convertemos
         vec3 hsv = vec3(H, S, V);
