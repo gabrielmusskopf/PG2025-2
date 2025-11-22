@@ -57,6 +57,8 @@ set(EXERCISES
     Exercicios/HelloTexture
     Exercicios/HelloSprites
     Trabalhos/Bomberman
+    Exercicios/HelloPixels
+    Exercicios/HelloHSV
 )
 
 add_compile_options(-Wno-pragmas)
